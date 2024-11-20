@@ -66,7 +66,7 @@
         <h1>أدخل رابط الفيديو المشفر لعرضه</h1>
         <input type="text" id="encodedUrl" placeholder="أدخل رابط الفيديو المشفر هنا..." required>
         <br>
-        <button onclick="decodeAndRedirect()">عرض الفيديو</button>
+        <button onclick="redirectToPlayer()">عرض الفيديو</button>
     </div>
     <div class="footer">
         <p>تابع قناتي على Telegram: <a href="https://t.me/your_channel" target="_blank">قناتي الرئيسية</a></p>
@@ -85,14 +85,14 @@
             }
         }
 
-        // دالة لإعادة التوجيه إلى الفيديو بعد فك التشفير
-        function decodeAndRedirect() {
+        // دالة لإعادة التوجيه إلى صفحة العرض
+        function redirectToPlayer() {
             const encodedUrl = document.getElementById('encodedUrl').value;
             const decodedUrl = decodeBase64(encodedUrl);
 
             if (decodedUrl) {
-                // إعادة التوجيه إلى الرابط المفكوك
-                window.location.href = decodedUrl;
+                // نرسل الرابط المفكوك إلى صفحة player.html
+                window.location.href = `player.html?videoUrl=${btoa(decodedUrl)}`;
             }
         }
     </script>
