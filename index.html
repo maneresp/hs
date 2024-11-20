@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عرض الفيديو المباشر</title>
+    <title>عرض الفيديو المشفر</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,22 +28,73 @@
             border-radius: 12px;
             text-align: center;
         }
-        video {
-            width: 100%;
-            height: auto;
-            margin-top: 30px;
-            border-radius: 10px;
+        input[type="text"] {
+            width: 90%;
+            padding: 15px;
+            margin: 25px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 18px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">مشاهدة الفيديو المباشر</div>
+    <div class="navbar">أدخل رابط الفيديو المشفر</div>
     <div class="container">
-        <h1>عرض الفيديو من رابط مباشر</h1>
-        <video controls>
-            <source src="http://www.awsfars.com/stream/114199?hash=59b85f" type="video/mp4">
-            المتصفح الخاص بك لا يدعم تشغيل الفيديو.
-        </video>
+        <h1>أدخل رابط الفيديو المشفر لعرضه</h1>
+        <input type="text" id="encodedUrl" placeholder="أدخل رابط الفيديو المشفر هنا..." required>
+        <br>
+        <button onclick="decodeAndRedirect()">عرض الفيديو</button>
     </div>
+    <div class="footer">
+        <p>تابع قناتي على Telegram: <a href="https://t.me/your_channel" target="_blank">قناتي الرئيسية</a></p>
+        <p>قناتي الاحتياطية على Telegram: <a href="https://t.me/your_backup_channel" target="_blank">قناتي الاحتياطية</a></p>
+    </div>
+
+    <script>
+        // دالة لفك التشفير من Base64
+        function decodeBase64(encodedStr) {
+            try {
+                // فك التشفير باستخدام atob (Base64)
+                return atob(encodedStr);
+            } catch (e) {
+                alert("حدث خطأ في فك التشفير. تأكد من أن الرابط المدخل مشفر بشكل صحيح.");
+                return null;
+            }
+        }
+
+        // دالة لإعادة التوجيه إلى الفيديو بعد فك التشفير
+        function decodeAndRedirect() {
+            const encodedUrl = document.getElementById('encodedUrl').value;
+            const decodedUrl = decodeBase64(encodedUrl);
+
+            if (decodedUrl) {
+                // إعادة التوجيه إلى الرابط المفكوك
+                window.location.href = decodedUrl;
+            }
+        }
+    </script>
 </body>
 </html>
