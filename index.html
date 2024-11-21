@@ -3,96 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عرض الفيديو المشفر</title>
+    <title>منصة أكس</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e0e0e0;
+            font-family: 'Cairo', sans-serif;
+            background-color: #5e5de8; /* خلفية بنفسجية */
             margin: 0;
             padding: 0;
-        }
-        .navbar {
-            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
         }
+
         .container {
-            max-width: 800px;
-            margin: 80px auto;
-            background-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            background-color: #222; /* خلفية القسم */
+            border-radius: 15px;
             padding: 40px;
-            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
+
+        .container h1 {
+            font-size: 26px;
+            color: #ffeb3b; /* أصفر */
+            margin-bottom: 20px;
+        }
+
+        .container p {
+            font-size: 18px;
+            color: #ddd; /* لون النص باهت */
+            margin: 10px 0;
+        }
+
         input[type="text"] {
-            width: 90%;
+            width: 100%;
             padding: 15px;
-            margin: 25px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: 1px solid #ffeb3b;
+            margin: 20px 0;
             font-size: 18px;
+            color: #333;
+            text-align: center;
+            background-color: #333; /* خلفية الحقل */
         }
+
         button {
-            background-color: #4CAF50;
+            background-color: #ff9800; /* برتقالي */
             color: white;
-            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .footer {
-            margin-top: 50px;
+            padding: 15px 25px;
+            border-radius: 10px;
             font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
         }
+
+        button:hover {
+            background-color: #e68900; /* برتقالي أغمق */
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #ffeb3b;
+        }
+
         .footer a {
-            color: #4CAF50;
+            color: #ffeb3b;
             text-decoration: none;
             font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">أدخل رابط الفيديو المشفر</div>
     <div class="container">
-        <h1>أدخل رابط الفيديو المشفر لعرضه</h1>
-        <input type="text" id="encodedUrl" placeholder="أدخل رابط الفيديو المشفر هنا..." required>
-        <br>
-        <button onclick="redirectToPlayer()">عرض الفيديو</button>
-    </div>
-    <div class="footer">
-        <p>تابع قناتي على Telegram: <a href="https://t.me/your_channel" target="_blank">قناتي الرئيسية</a></p>
-        <p>قناتي الاحتياطية على Telegram: <a href="https://t.me/your_backup_channel" target="_blank">قناتي الاحتياطية</a></p>
+        <h1>منصة أكس</h1>
+        <p>بلتعاون مع منصة شمس السادس ومنصة ماكس</p>
+        <p>ألصق الكود هنا 👇</p>
+        <input type="text" id="codeInput" placeholder="أدخل الكود هنا">
+        <button onclick="redirectToDecodedUrl()">تشغيل المحاضرة</button>
+        <div class="footer">
+            <p>بوت أكس : <a href="https://t.me/X_platformBot" target="_blank">اضغط هنا</a></p>
+        </div>
     </div>
 
     <script>
         // دالة لفك التشفير من Base64
         function decodeBase64(encodedStr) {
             try {
-                // فك التشفير باستخدام atob (Base64)
-                return atob(encodedStr);
-            } catch (e) {
-                alert("حدث خطأ في فك التشفير. تأكد من أن الرابط المدخل مشفر بشكل صحيح.");
+                return atob(encodedStr); // فك تشفير Base64
+            } catch (error) {
+                alert("الكود غير صحيح أو مشفر بشكل خاطئ.");
                 return null;
             }
         }
 
-        // دالة لإعادة التوجيه إلى صفحة العرض
-        function redirectToPlayer() {
-            const encodedUrl = document.getElementById('encodedUrl').value;
-            const decodedUrl = decodeBase64(encodedUrl);
+        // دالة لتوجيه المستخدم إلى الرابط
+        function redirectToDecodedUrl() {
+            const encodedCode = document.getElementById('codeInput').value;
+
+            if (!encodedCode) {
+                alert("الرجاء إدخال الكود أولاً.");
+                return;
+            }
+
+            const decodedUrl = decodeBase64(encodedCode);
 
             if (decodedUrl) {
-                // نرسل الرابط المفكوك إلى صفحة player.html
-                window.location.href = `player.html?videoUrl=${btoa(decodedUrl)}`;
+                // تحويل المستخدم مباشرة إلى الرابط المفكوك
+                window.location.href = decodedUrl;
             }
         }
     </script>
